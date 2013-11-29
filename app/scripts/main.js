@@ -12,14 +12,30 @@ function onscatterPlot(){
 }
 
 function onboxPlot(){
-	analytics.boxPlot();
+	var plotdata = null;
+	var args = {
+		selector: "#canvas",
+		data: plotdata
+	};
+	analytics.boxPlot(args);
 }
 
 function onhovPlot(){
-	analytics.hovPlot();
+	var plotdata = null;
+	var args = {
+		selector: "#canvas",
+		data: plotdata
+	};
+
+	analytics.hovPlot(args);
 }
 
 
 function onparallelsPlot(){
-	analytics.parallelsPlot();
+	var plotdata = null;
+	var args = {
+		selector: "#canvas",
+		data: plotdata
+	};
+	analytics.parallelsPlot(args);
 }
