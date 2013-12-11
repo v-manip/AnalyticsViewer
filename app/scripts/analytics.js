@@ -1,5 +1,8 @@
 var analytics = {
 
+	margin : {top: 20, right: 20, bottom: 90, left: 70},
+	
+
 	scatterPlot: function(arg){
 		console.log("Scatter");
 		/*###############################################################*/
@@ -10,9 +13,8 @@ var analytics = {
 		var el = d3.select(arg.selector);
 		$(arg.selector).empty();
 
-		var margin = {top: 20, right: 20, bottom: 30, left: 40},
-		    width = $(arg.selector).width() - margin.left - margin.right,
-		    height = $(arg.selector).height() - margin.top - margin.bottom;
+		var width = $(arg.selector).width() - analytics.margin.left - analytics.margin.right,
+			height = $(arg.selector).height() - analytics.margin.top - analytics.margin.bottom;
 
 		
 		var x = d3.scale.linear()
@@ -32,10 +34,10 @@ var analytics = {
 		    .orient("left");
 
 		var svg = el.append("svg")
-		    .attr("width", width + margin.left + margin.right)
-		    .attr("height", height + margin.top + margin.bottom)
+		    .attr("width", width +analytics.margin.left +analytics.margin.right)
+		    .attr("height", height +analytics.margin.top +analytics.margin.bottom)
 		  .append("g")
-		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		    .attr("transform", "translate(" +analytics.margin.left + "," +analytics.margin.top + ")");
 
 			
 		d3.tsv("data.tsv", function(error, data) {
@@ -122,23 +124,16 @@ var analytics = {
 		
 		var el = d3.select(arg.selector);
 		$(arg.selector).empty();
-    		var margin = {top: 20, right: 20, bottom: 30, left: 40},
-		    width = $(arg.selector).width() - margin.left - margin.right,
-		    height = $(arg.selector).height() - margin.top - margin.bottom;
-		
-		
-		var bmargin = {top: 10, right: 50, bottom: 20, left: 50},
-		    bwidth = 120 - bmargin.left - bmargin.right,
-		    bheight = 800 - bmargin.top - bmargin.bottom;
-		
+
+    	var width = $(arg.selector).width() -analytics.margin.left - analytics.margin.right,
+		    height = $(arg.selector).height() -analytics.margin.top - analytics.margin.bottom;
+
+		var box_separation = 40;
 		
 		var min = Infinity,
 		    max = -Infinity;
 
-		var chart = d3.box()
-		    .whiskers(iqr(1.5))
-		    .width(bwidth)
-		    .height(bheight);
+		
 
 		d3.csv("FSC_filtered_new.csv", function(error, csv) {
 		  var data = [];
@@ -154,22 +149,24 @@ var analytics = {
 		    if (s < min) min = s;
 		  });
 
-		  chart.domain([min, max]);
-
-		var svg = el.selectAll("svg")
-		    .attr("width", width + margin.left + margin.right)
-		    .attr("height", height + margin.top + margin.bottom)
-		  .append("g")
-		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 		  
-		  svg.append("g")
+
+	  	var chart = d3.box()
+		    .whiskers(iqr(1.5))
+		    .width(width/data.length - box_separation*2)
+		    .height(height - analytics.margin.top - analytics.margin.bottom);
+
+		chart.domain([min, max]);
+
+		var svg = el.selectAll("svg")  
+		    .append("g")
 		      .data(data)
 		    .enter().append("svg")
 		      .attr("class", "box")
-		      .attr("width", bwidth + bmargin.left + bmargin.right)
-		      .attr("height", bheight + bmargin.bottom + bmargin.top)
+		      .attr("width", width/data.length)
+		      .attr("height", height + analytics.margin.bottom + analytics.margin.top)
 		    .append("g")
-		      .attr("transform", "translate(" + bmargin.left + "," + bmargin.top + ")")
+		      .attr("transform", "translate(" + box_separation + "," + analytics.margin.top + ")")
 		      .call(chart);
 		});
 
@@ -189,15 +186,12 @@ var analytics = {
 		var species = ["setosa", "versicolor", "virginica"],
 		    traits = ["sepal length", "petal length", "sepal width", "petal width"];
 
-    	var margin = {top: 20, right: 20, bottom: 30, left: 40},
-	   	width = $(arg.selector).width() - margin.left - margin.right,
-		height = $(arg.selector).height() - margin.top - margin.bottom;
+    	var	width = $(arg.selector).width() - analytics.margin.left - analytics.margin.right,
+			height = $(arg.selector).height() - analytics.margin.top - analytics.margin.bottom;
 
-		var m = [80, 160, 200, 160],
-		    w = 1280 - m[1] - m[3],
-		    h = 800 - m[0] - m[2];
+		console.log(width,height);
 
-		var x = d3.scale.ordinal().domain(traits).rangePoints([0, w]),
+		var x = d3.scale.ordinal().domain(traits).rangePoints([0, width]),
 		    y = {};
 
 		var line = d3.svg.line(),
@@ -206,10 +200,8 @@ var analytics = {
 
 		var svg = el.append("svg:svg")
 			.attr("class", "svg")
-		    .attr("width", w + m[1] + m[3])
-		    .attr("height", h + m[0] + m[2])
 		  .append("svg:g")
-		    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+		    .attr("transform", "translate(" + analytics.margin.left + "," + analytics.margin.top + ")");
 
 
 		d3.csv("iris.csv", function(flowers) {
@@ -217,11 +209,11 @@ var analytics = {
 		  // Create a scale and brush for each trait.
 		  traits.forEach(function(d) {
 		    // Coerce values to numbers.
-		    flowers.forEach(function(p) { p[d] = +p[d]* Math.random(); });
+		    //flowers.forEach(function(p) { p[d] = +p[d]* Math.random(); });
 
 		    y[d] = d3.scale.linear()
 		        .domain(d3.extent(flowers, function(p) { return p[d]; }))
-		        .range([h, 0]);
+		        .range([height, 0]);
 
 		    y[d].brush = d3.svg.brush()
 		        .y(y[d])
@@ -259,11 +251,11 @@ var analytics = {
 		    .enter().append("svg:g")
 		      .attr("class", "trait")
 		      .attr("transform", function(d) { return "translate(" + x(d) + ")"; })
-		      .call(d3.behavior.drag()
+		     /* .call(d3.behavior.drag()
 		      .origin(function(d) { return {x: x(d)}; })
 		      .on("dragstart", dragstart)
 		      .on("drag", drag)
-		      .on("dragend", dragend));
+		      .on("dragend", dragend))*/;
 
 		  // Add an axis and title.
 		  g.append("svg:g")
@@ -282,7 +274,7 @@ var analytics = {
 		      .attr("x", -8)
 		      .attr("width", 16);
 
-		  function dragstart(d) {
+		  /*function dragstart(d) {
 		    i = traits.indexOf(d);
 		  }
 
@@ -298,7 +290,7 @@ var analytics = {
 		    var t = d3.transition().duration(500);
 		    t.selectAll(".trait").attr("transform", function(d) { return "translate(" + x(d) + ")"; });
 		    t.selectAll(".foreground path").attr("d", path);
-		  }
+		  }*/
 		});
 
 		// Returns the path for a given data point.
