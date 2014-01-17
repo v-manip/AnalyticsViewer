@@ -1,8 +1,19 @@
 
 
 svg {
-  font-size: 14px;
-}
+  font-size: 14px;  
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  // Trying to get SVG to act like a greedy block in all browsers
+  //display: block;
+  //width:100%;
+  //height:100%;
+
+  }
 
 .foreground path {
   fill: none;
@@ -24,17 +35,52 @@ svg {
   stroke-width: 2px;
 }
 
-.setosa {
+.id0 {
   stroke: #800;
 }
 
-.versicolor {
+.id1 {
   stroke: #080;
 }
 
-.virginica {
+.id2 {
   stroke: #008;
 }
+
+.id3 {
+  stroke: #500;
+}
+
+.id4 {
+  stroke: #050;
+}
+
+.id5 {
+  stroke: #005;
+}
+
+.id6 {
+  stroke: #300;
+}
+
+.id7 {
+  stroke: #030;
+}
+
+.id8 {
+  stroke: #003;
+}
+
+.id9 {
+  stroke: #100;
+}
+
+.id10 {
+  stroke: #010;
+}
+
+
+
 
 .brush .extent {
   fill-opacity: .3;
@@ -72,3 +118,4 @@ svg {
   fill: none;
   stroke: #ccc;
 }
+
