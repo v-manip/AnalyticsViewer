@@ -88,7 +88,7 @@ function convertData(inputData) {
 		
 		var mine = d3.csv.parse(arg.data);
 		var data = convertData(mine);
-		
+	/*	
 	  	var chart = d3.box()
 		    .whiskers(iqr(1.5))
 		    .width(width/data.length - box_separation*2)
@@ -106,11 +106,31 @@ function convertData(inputData) {
 		    .append("g")
 		      .attr("transform", "translate(" + box_separation + "," + analytics.margin.top + ")")
 		      .call(chart);
+*/
 
+			 var chart = d3.box()
+                 .whiskers(iqr(1.5))
+                 .width(width/data.length - box_separation*2)
+                 .height(height - analytics.margin.top - analytics.margin.bottom);
 
+                chart.domain([min, max]);
 
+                var svg = el.selectAll("svg")				 .attr("display", "none")
+                 .append("g")
+                 .data(data)
+                 .enter().append("svg")
+                 .attr("class", "box")
+
+                 .attr("width", width/data.length)
+                 .attr("height", height + analytics.margin.bottom + analytics.margin.top)
+                 .append("g")
+                 .attr("transform", "translate(" + box_separation + "," + analytics.margin.top + ")")
+                 .call(chart);
+			  
+			  
 
 function convertData(inputData) {
+console.log(inputData);
 	var data = [];
 	var uniqueArray = [];
 
@@ -134,6 +154,7 @@ function convertData(inputData) {
 		    if (s < min) min = s;
 		}	   
 	}
+	console.log(data);
 	return data;
 }
 		
