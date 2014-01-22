@@ -15,27 +15,7 @@ svg {
 
   }
 
-.foreground path {
-  fill: none;
-  stroke-opacity: .5;
-  stroke-width: 1.5px;
-}
-
-.foreground path.fade {
-  stroke: #000;
-  stroke-opacity: .05;
-}
-
-.legend {
-  font-size: 18px;
-  font-style: oblique;
-}
-
-.legend line {
-  stroke-width: 2px;
-}
-
-.id0 {
+ .id0 {
   stroke: #800;
 }
 
@@ -79,7 +59,25 @@ svg {
   stroke: #010;
 }
 
+.foreground path {
+  fill: none;
+  stroke-opacity: .5;
+  stroke-width: 1.5px;
+}
 
+.foreground path.fade {
+  stroke: #000;
+  stroke-opacity: .05;
+}
+
+.legend {
+  font-size: 18px;
+  font-style: oblique;
+}
+
+.legend line {
+  stroke-width: 2px;
+}
 
 
 .brush .extent {
@@ -120,3 +118,7 @@ svg {
   stroke: #ccc;
 }
 
+svg.box{
+  width: auto;
+  display: inline;
+}
