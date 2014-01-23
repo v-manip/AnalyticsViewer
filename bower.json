@@ -9,6 +9,7 @@
     "nvd3": "https://github.com/novus/nvd3/archive/v1.1.15-beta.zip"
   },
   "ignore" : [
+    "**/.*",
     "app"
   ]
 }
