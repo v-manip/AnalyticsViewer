@@ -13,6 +13,9 @@ module.exports = function (grunt) {
     // load all grunt tasks
     require('load-grunt-tasks')(grunt);
 
+    grunt.loadNpmTasks('grunt-release');
+    grunt.loadNpmTasks('grunt-contrib-compress');
+
     grunt.initConfig({
         // configurable paths
         yeoman: {
@@ -185,7 +188,7 @@ module.exports = function (grunt) {
                 assetsDirs: ['<%= yeoman.dist %>']
             },
             html: ['<%= yeoman.dist %>/{,*/}*.html'],
-            css: ['<%= yeoman.dist %>/styles/{,*/}*.css']
+            //css: ['<%= yeoman.dist %>/styles/{,*/}*.css']
         },
         imagemin: {
             dist: {
@@ -294,7 +297,31 @@ module.exports = function (grunt) {
                 'svgmin',
                 'htmlmin'
             ]
+        },
+        release: {
+            options: {
+                push: false, //default: true
+                pushTags: false, //default: true
+                npm: false, //default: true
+                tagName: 'v<%= version %>', //default: '<%= version %>'
+                tagMessage: 'Tagging version v<%= version %>', //default: 'Version <%= version %>',
+                commitMessage: 'Release v<%= version %>', //default: 'release <%= version %>'
+                github: false
+            }
+        },
+        compress: {
+            release: {
+                options: {
+                    archive: 'release/analytics.zip'
+                },
+                files: [
+                    { expand: true, cwd: 'dist/scripts', src: ['*.min.js'], dest: 'analytics' },
+                    { expand: true, cwd: 'dist/styles', src: ['*.min.css'], dest: 'analytics' },
+                    { expand: true, src: ['Readme.md'], dest: 'analytics' }
+                ]
+            }
         }
+
     });
 
     grunt.registerTask('serve', function (target) {
