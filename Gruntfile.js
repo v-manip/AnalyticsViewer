@@ -354,14 +354,14 @@ module.exports = function (grunt) {
         'uglify',
         'modernizr',
         'copy:dist',
-        'rev',
         'usemin'
     ]);
 
 
     grunt.registerTask('createrelease', [
+        'clean:dist',
         'build',
-        'compress',
+        'compress:release',
         'release'
     ]);
 
