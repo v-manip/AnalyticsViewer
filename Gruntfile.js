@@ -343,13 +343,6 @@ module.exports = function (grunt) {
       grunt.task.run(['serve']);
     });
 
-    grunt.registerTask('test', [
-        'clean:server',
-        'concurrent:test',
-        'autoprefixer',
-        'connect:test',
-        'mocha'
-    ]);
 
     grunt.registerTask('build', [
         'clean:dist',
@@ -363,6 +356,13 @@ module.exports = function (grunt) {
         'copy:dist',
         'rev',
         'usemin'
+    ]);
+
+
+    grunt.registerTask('createrelease', [
+        'build',
+        'compress',
+        'release'
     ]);
 
     grunt.registerTask('default', [
