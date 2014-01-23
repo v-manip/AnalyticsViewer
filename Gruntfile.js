@@ -20,7 +20,7 @@ module.exports = function (grunt) {
         // configurable paths
         yeoman: {
             app: 'app',
-            dist: 'dist'
+            dist: 'lib'
         },
         watch: {
             compass: {
@@ -315,8 +315,8 @@ module.exports = function (grunt) {
                     archive: 'release/analytics.zip'
                 },
                 files: [
-                    { expand: true, cwd: 'dist/scripts', src: ['*.min.js'], dest: 'analytics' },
-                    { expand: true, cwd: 'dist/styles', src: ['*.min.css'], dest: 'analytics' },
+                    { expand: true, cwd: '<%= yeoman.dist %>/scripts', src: ['*.min.js'], dest: 'analytics' },
+                    { expand: true, cwd: '<%= yeoman.dist %>/styles', src: ['*.min.css'], dest: 'analytics' },
                     { expand: true, src: ['README.md'], dest: 'analytics' }
                 ]
             }
