@@ -9,13 +9,14 @@
         <title>AnalyticsViewer</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
+
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
         <!-- build:css(.tmp) styles/main.css -->
-        <link rel="stylesheet" href="styles/main.css">
+            <link rel="stylesheet" href="styles/main.css" />
+            <link href="bower_components/nvd3/nv.d3.min.css" rel="stylesheet" type="text/css">
         <!-- endbuild -->
-        <!-- build:js scripts/vendor/modernizr.js -->
-        <script src="bower_components/modernizr/modernizr.js"></script>
-        <!-- endbuild -->
+
+
     </head>
     <body>
         <!--[if lt IE 10]>
@@ -55,24 +56,18 @@
 
 
         <!-- build:js scripts/plugins.js -->
-        <script src="bower_components/sass-bootstrap/js/affix.js"></script>
-        <script src="bower_components/sass-bootstrap/js/alert.js"></script>
-        <script src="bower_components/sass-bootstrap/js/dropdown.js"></script>
-        <script src="bower_components/sass-bootstrap/js/tooltip.js"></script>
-        <script src="bower_components/sass-bootstrap/js/modal.js"></script>
-        <script src="bower_components/sass-bootstrap/js/transition.js"></script>
-        <script src="bower_components/sass-bootstrap/js/button.js"></script>
-        <script src="bower_components/sass-bootstrap/js/popover.js"></script>
-        <script src="bower_components/sass-bootstrap/js/carousel.js"></script>
-        <script src="bower_components/sass-bootstrap/js/scrollspy.js"></script>
-        <script src="bower_components/sass-bootstrap/js/collapse.js"></script>
-        <script src="bower_components/sass-bootstrap/js/tab.js"></script>
-        <script src="bower_components/d3/d3.js"></script>
+        <script src="bower_components/sass-bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="bower_components/d3/d3.min.js"></script>
+        <script src="bower_components/nvd3/nv.d3.min.js"></script>
         <!-- endbuild -->
 
-                <!-- build:js scripts/analytics.js -->
+
+        
+
+		<!-- build:js scripts/analytics.js -->
         <script src="scripts/analytics.js"></script>
         <script src="scripts/box.js"></script>
+        <script src="scripts/fisheye.js"></script>
         <!-- endbuild -->
 
 
