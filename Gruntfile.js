@@ -317,7 +317,7 @@ module.exports = function (grunt) {
                 files: [
                     { expand: true, cwd: 'dist/scripts', src: ['*.min.js'], dest: 'analytics' },
                     { expand: true, cwd: 'dist/styles', src: ['*.min.css'], dest: 'analytics' },
-                    { expand: true, src: ['Readme.md'], dest: 'analytics' }
+                    { expand: true, src: ['README.md'], dest: 'analytics' }
                 ]
             }
         }
