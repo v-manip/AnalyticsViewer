@@ -29,7 +29,7 @@ var analytics = {
 			.attr("display", "block")
 			.attr("width", width)
 		    .attr("height", height)
-			.datum(convertData(mine, mine.length, 40))
+			.datum(convertData(mine))
 			.call(chart);
 
   		nv.utils.windowResize(chart.update);
@@ -41,25 +41,33 @@ var analytics = {
 		   var uniqueArray = [];
 
 			for (i = 0; i < inputData.length; i++) {
-				if (uniqueArray.indexOf(inputData[i].id) == -1)
+				var array = $.map(inputData[i], function(value, index) {
+				    return [value];
+				});
+				if (uniqueArray.indexOf(array[0]) == -1)
 				{
-					uniqueArray.push(inputData[i].id);
+					uniqueArray.push(array[0]);
 					data.push({
-						key: inputData[i].id,
+						key: array[0],
 						values: []
 					});
 				}
 			}
+
+			//console.log(uniqueArray);
 			 
 			for (j = 0; j < uniqueArray.length; j++) {
 				for (k = 0; k < inputData.length; k++)
 				{
-					if (inputData[k].id == uniqueArray[j])
+					var array = $.map(inputData[k], function(value, index) {
+					    return [value];
+					});
+					if (array[0] == uniqueArray[j])
 					{
 						data[j].values.push({
-						  x: inputData[k].val1
-						, y: inputData[k].val2
-						, size: inputData[k].val3
+						  x: array[1]
+						, y: array[2]
+						, size: array[3]
 						});
 					}
 				}	   
@@ -84,10 +92,14 @@ var analytics = {
 		
 		var mine = d3.csv.parse(arg.data);
 		var data = convertData(mine);
+
+		var calc_width = width/data.length - box_separation*2;
+		if (calc_width > 100)
+			calc_width = 100;
 	
 		var chart = d3.box()
 			.whiskers(iqr(1.5))
-			.width(width/data.length - box_separation*2)
+			.width(calc_width)
 			.height(height - analytics.margin.top - analytics.margin.bottom);
 
         chart.domain([min, max]);
@@ -101,9 +113,9 @@ var analytics = {
 			.attr("width", width/data.length)
 			.attr("height", height + analytics.margin.bottom + analytics.margin.top)
 			.append("g")
-			.attr("transform", "translate(" + box_separation + "," + analytics.margin.top + ")")
+			.attr("transform", "translate(" + ( width/data.length/2 - calc_width/2) + "," + analytics.margin.top + ")")
 			.call(chart);
-			  
+		  
 			  
 
 		function convertData(inputData) {
@@ -112,18 +124,24 @@ var analytics = {
 			var uniqueArray = [];
 
 			for (i = 0; i < inputData.length; i++) {
-				if (uniqueArray.indexOf(inputData[i].id) == -1)
+				var array = $.map(inputData[i], function(value, index) {
+				    return [value];
+				});
+				if (uniqueArray.indexOf(array[0]) == -1)
 				{
-					uniqueArray.push(inputData[i].id);
+					uniqueArray.push(array[0]);
 				}
 			}
 			 
 			for (j = 0; j < uniqueArray.length; j++) {
 				for (k = 0; k < inputData.length; k++)
 				{
-					if (inputData[k].id != uniqueArray[j]) continue;
+					var array = $.map(inputData[k], function(value, index) {
+					    return [value];
+					});
+					if (array[0] != uniqueArray[j]) continue;
 				    var e = j,
-				        s = parseFloat(inputData[k].val1),
+				        s = parseFloat(array[1]),
 				        d = data[e];
 				    if (!d) d = data[e] = [s];
 				    else d.push(s);
@@ -150,9 +168,12 @@ var analytics = {
 
 		var mine = d3.csv.parse(arg.data);	
 		for (i = 0; i < mine.length; i++) {
-			if (uniqueArray.indexOf(mine[i].id) == -1)
+			var array = $.map(mine[i], function(value, index) {
+			    return [value];
+			});
+			if (uniqueArray.indexOf(array[0]) == -1)
 			{
-				uniqueArray.push(mine[i].id);
+				uniqueArray.push(array[0]);
 			}
 		}
 
@@ -202,6 +223,8 @@ var analytics = {
 		        .on("brush", brush);
 		 });
 
+		  var colors = d3.scale.category10().domain(uniqueArray);
+
 		 
 		  // Add a legend.
 		  var legend = svg.selectAll("g.legend")
@@ -212,13 +235,17 @@ var analytics = {
 
 		  legend.append("svg:line")
 		      .attr("class", String)
-		      .attr("x2", 8);
+		      .attr("x2", 8)
+		      .attr("stroke",function(d) {
+		      	return colors(d);
+		      });
 
 		  legend.append("svg:text")
 		      .attr("x", 12)
 		      .attr("dy", ".31em")
 		      .text(function(d) { return "Item " + d; });
 
+		 
 		  // Add foreground lines.
 		  foreground = svg.append("svg:g")
 		      .attr("class", "foreground")
@@ -226,7 +253,18 @@ var analytics = {
 		      .data(mine)
 		    .enter().append("svg:path")
 		      .attr("d", path)
-		      .attr("class", function(d) { return d.id; });
+		      .attr("stroke",function(d) {
+		      	var array = $.map(d, function(value, index) {
+				    return [value];
+				});
+		      	return colors(array[0]);
+		      })
+		      .attr("class", function(d) {
+		      	var array = $.map(d, function(value, index) {
+				    return [value];
+				});
+		       	return array[0]; 
+	   		  });
 
 		  // Add a group element for each trait.
 		  var g = svg.selectAll(".trait")
