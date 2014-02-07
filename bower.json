@@ -6,9 +6,10 @@
     "modernizr": "~2.6.2",
     "jquery": "~1.10.2",
     "d3": "~3.3.10",
-    "nvd3": "https://github.com/novus/nvd3/archive/v1.1.15-beta.zip"
+    "nvd3": "https://github.com/novus/nvd3/archive/v1.1.15-beta.zip",
+    "underscore": "~1.5.2"
   },
-  "ignore" : [
+  "ignore": [
     "**/.*",
     "app"
   ]

@@ -65,9 +65,9 @@ var analytics = {
 					if (array[0] == uniqueArray[j])
 					{
 						data[j].values.push({
-						  x: array[1]
-						, y: array[2]
-						, size: array[3]
+						  x: parseFloat(array[1])
+						, y: parseFloat(array[2])
+						, size: parseFloat(array[3])
 						});
 					}
 				}	   
@@ -163,8 +163,8 @@ var analytics = {
 
 		var traits = [];
 		var uniqueArray = [];
-
-
+		var domain = [];
+		var data = new Object();
 
 		var mine = d3.csv.parse(arg.data);	
 		for (i = 0; i < mine.length; i++) {
@@ -175,6 +175,16 @@ var analytics = {
 			{
 				uniqueArray.push(array[0]);
 			}
+		}
+
+		for (i = 0; i < mine.length; i++) {
+			$.each(mine[i], function(value, index) {
+			    if(typeof(data[value]) == 'undefined' || data[value] == null){
+			    	data[value] = [parseFloat(index)];
+			    }else{
+			    	data[value].push(parseFloat(index))
+			    }
+			});
 		}
 
 		var L = mine.length;
@@ -213,9 +223,11 @@ var analytics = {
 
 
 		  // Create a scale and brush for each trait.
+		  console.log(data);
 		  traits.forEach(function(d) {
+		  	console.log(d,d3.min(data[d]),d3.max(data[d]));
 		    y[d] = d3.scale.linear()
-		        .domain(d3.extent(mine, function(p) { return p[d]; }))
+		        .domain([d3.min(data[d]),d3.max(data[d])])
 		        .range([height, 0]);
 
 		    y[d].brush = d3.svg.brush()
