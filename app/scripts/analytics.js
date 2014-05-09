@@ -4,7 +4,6 @@ var analytics = {
 	
 
 	scatterPlot: function(arg){
-		
 		var chart = nv.models.scatterChart()
             .showDistX(true)
             .showDistY(true)
@@ -153,7 +152,83 @@ var analytics = {
 		}
 	},
 
-	hovPlot: function(arg){
+	stackedPlot: function(arg){
+		var colors = d3.scale.category20();
+		keyColor = function(d, i) {return colors(d.key)};
+
+     	var el = d3.select(arg.selector);
+		var el = d3.select(arg.selector);
+		$(arg.selector).empty();
+		var width = $(arg.selector).width() - analytics.margin.left - analytics.margin.right,
+			height = $(arg.selector).height() - analytics.margin.top - analytics.margin.bottom;
+
+			
+		var chart = nv.models.stackedAreaChart()
+                .useInteractiveGuideline(true)
+                .x(function(d) { return d[0] })
+                .y(function(d) { return d[1] })
+                .color(keyColor)
+                .transitionDuration(300);
+                //.clipEdge(true);
+
+		chart.xAxis.tickFormat(function(d) { return d3.time.format('%x')(new Date(d)) });
+		chart.yAxis.tickFormat(d3.format(',.2f'));
+		
+		var mine = d3.csv.parse(arg.data);
+		
+		el.append("svg")
+			.attr("display", "block")
+			.attr("width", width)
+		    .attr("height", height)
+			.datum(convertData(mine))
+			.transition().duration(1000)
+			.call(chart)
+			.each('start', function() {
+				setTimeout(function() {
+					el.selectAll('svg *').each(function() {
+					if(this.__transition__)
+						this.__transition__.duration = 1;
+					})
+				}, 0)
+			})
+
+		nv.utils.windowResize(chart.update);
+  
+		function convertData(inputData) {
+		   var data = [];
+		   var uniqueArray = [];
+
+			for (i = 0; i < inputData.length; i++) {
+				var array = $.map(inputData[i], function(value, index) {
+				    return [value];
+				});
+				if (uniqueArray.indexOf(array[0]) == -1)
+				{
+					uniqueArray.push(array[0]);
+					data.push({
+						key: array[0],
+						values: []
+					});
+				}
+			}
+			 
+			for (j = 0; j < uniqueArray.length; j++) {
+				for (k = 0; k < inputData.length; k++)
+				{
+					var array = $.map(inputData[k], function(value, index) {
+					    return [value];
+					});
+					if (array[0] == uniqueArray[j])
+					{
+						data[j].values.push({
+						  0: parseFloat(array[1])
+						, 1: parseFloat(array[2])
+						});
+					}
+				}	   
+			}
+			return data;
+		}
 	},
 
 
