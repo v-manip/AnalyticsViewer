@@ -221,7 +221,7 @@ var analytics = {
 					if (array[0] == uniqueArray[j])
 					{
 						data[j].values.push({
-						  0: parseFloat(array[1])
+						  0: new Date(array[1])
 						, 1: parseFloat(array[2])
 						});
 					}
