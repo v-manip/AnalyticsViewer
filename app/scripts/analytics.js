@@ -11,8 +11,8 @@ var analytics = {
             .color(d3.scale.category10().range())
             //.transitionDuration(300);
 
-			chart.xAxis.tickFormat(d3.format('.02f'));
-			chart.yAxis.tickFormat(d3.format('.02f'));
+			chart.xAxis.tickFormat(d3.format());
+			chart.yAxis.tickFormat(d3.format());
 			chart.tooltipContent(function(key) {
 				return '<p>' + key + '</p>';
 			});
@@ -172,7 +172,7 @@ var analytics = {
                 //.clipEdge(true);
 
 		chart.xAxis.tickFormat(function(d) { return d3.time.format('%x')(new Date(d)) });
-		chart.yAxis.tickFormat(d3.format(',.2f'));
+		chart.yAxis.tickFormat(d3.format());
 		
 		var mine = d3.csv.parse(arg.data);
 		
@@ -191,6 +191,102 @@ var analytics = {
 					})
 				}, 0)
 			})
+
+		nv.utils.windowResize(chart.update);
+  
+		function convertData(inputData) {
+		   var data = [];
+		   var uniqueArray = [];
+
+			for (i = 0; i < inputData.length; i++) {
+				var array = $.map(inputData[i], function(value, index) {
+				    return [value];
+				});
+				if (uniqueArray.indexOf(array[0]) == -1)
+				{
+					uniqueArray.push(array[0]);
+					data.push({
+						key: array[0],
+						values: []
+					});
+				}
+			}
+			 
+			for (j = 0; j < uniqueArray.length; j++) {
+				for (k = 0; k < inputData.length; k++)
+				{
+					var array = $.map(inputData[k], function(value, index) {
+					    return [value];
+					});
+					if (array[0] == uniqueArray[j])
+					{
+						data[j].values.push({
+						  0: new Date(array[1])
+						, 1: parseFloat(array[2])
+						});
+					}
+				}	   
+			}
+			return data;
+		}
+	},
+
+
+	linePlot: function(arg){
+		var colors = d3.scale.category10();
+		keyColor = function(d, i) {return colors(d.key)};
+
+     	var el = d3.select(arg.selector);
+
+		//var data = d3.csv.parse(arg.data);
+
+
+		$(arg.selector).empty();
+		var width = $(arg.selector).width() - analytics.margin.left - analytics.margin.right,
+			height = $(arg.selector).height() - analytics.margin.top - analytics.margin.bottom;
+
+		var chart = nv.models.lineChart()
+                .margin({left: 100})  //Adjust chart margins to give the x-axis some breathing room.
+                .useInteractiveGuideline(true)  //We want nice looking tooltips and a guideline!
+                .transitionDuration(350)  //how fast do you want the lines to transition?
+                .showLegend(true)       //Show the legend, allowing users to turn on/off line series.
+                .showYAxis(true)        //Show the y-axis
+                .showXAxis(true)        //Show the x-axis
+                .x(function(d) { return d[0] })
+                .y(function(d) { return d[1] })
+                .color(keyColor)
+		;
+
+		chart.xAxis     //Chart x-axis settings
+			.axisLabel('Time')
+		  	.tickFormat(function(d) { return d3.time.format('%x %Hh')(new Date(d)) });
+
+		chart.yAxis     //Chart y-axis settings
+		  .axisLabel('Values')
+		  .tickFormat(d3.format());
+
+		var data = convertData(d3.csv.parse(arg.data));
+
+		/*var chart = nv.models.stackedAreaChart()
+                .useInteractiveGuideline(true)
+                .x(function(d) { return d[0] })
+                .y(function(d) { return d[1] })
+                .color(keyColor)
+                .transitionDuration(300);
+                //.clipEdge(true);
+
+		chart.xAxis.tickFormat(function(d) { return d3.time.format('%x')(new Date(d)) });
+		chart.yAxis.tickFormat(d3.format());*/
+		
+		
+		
+		el.append("svg")
+			.attr("display", "block")
+			.attr("width", width)
+		    .attr("height", height)
+			.datum(data)
+			.call(chart)
+			
 
 		nv.utils.windowResize(chart.update);
   
