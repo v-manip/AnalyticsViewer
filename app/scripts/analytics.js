@@ -4,11 +4,23 @@ var analytics = {
 	
 
 	scatterPlot: function(arg){
+		var colors = null;
+		if(arg.colors)
+			colors = arg.colors;
+		else
+			colors = d3.scale.category10();
+
+		keyColor = function(d, i) {
+			var n = d.key.lastIndexOf("_");
+			var key = d.key.substring(0, n);
+			return colors(key);
+		};
+		
 		var chart = nv.models.scatterChart()
             .showDistX(true)
             .showDistY(true)
             .useVoronoi(true)
-            .color(d3.scale.category10().range())
+            .color(keyColor)
             //.transitionDuration(300);
 
 			chart.xAxis.tickFormat(d3.format());
@@ -73,6 +85,43 @@ var analytics = {
 			}
 			return data;
 		}
+
+		/*function convertData(inputData) {
+		   var data = [];
+		   var uniqueArray = [];
+
+			for (i = 0; i < inputData.length; i++) {
+				var array = $.map(inputData[i], function(value, index) {
+				    return [value];
+				});
+				if (uniqueArray.indexOf(array[0]) == -1)
+				{
+					uniqueArray.push(array[0]);
+					data.push({
+						key: array[0],
+						values: []
+					});
+				}
+			}
+			 
+			for (j = 0; j < uniqueArray.length; j++) {
+				for (k = 0; k < inputData.length; k++)
+				{
+					var array = $.map(inputData[k], function(value, index) {
+					    return [value];
+					});
+					if (array[0] == uniqueArray[j])
+					{
+						data[j].values.push({
+						  0: parseFloat(array[1])
+						, 1: parseFloat(array[2])
+						, 2: parseFloat(array[3])
+						});
+					}
+				}	   
+			}
+			return data;
+		}*/
 	},
 
 	boxPlot: function(arg){
@@ -233,8 +282,16 @@ var analytics = {
 
 
 	linePlot: function(arg){
-		var colors = d3.scale.category10();
-		keyColor = function(d, i) {return colors(d.key)};
+
+		var colors = null;
+		if(arg.colors)
+			colors = arg.colors;
+		else
+			colors = d3.scale.category10();
+
+		keyColor = function(d, i) {
+			return colors(d.key)
+		};
 
      	var el = d3.select(arg.selector);
 
