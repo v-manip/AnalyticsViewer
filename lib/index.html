@@ -11,17 +11,11 @@
         <meta name="viewport" content="width=device-width">
 
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-        <!-- build:css(.tmp) styles/main.css -->
-            <link rel="stylesheet" href="styles/main.css">
-        <!-- endbuild -->
+        <link rel="stylesheet" href="styles/main.css"/>
 
-        <!-- build:css(.tmp) styles/analytics.min.css -->
-            <link rel="stylesheet" href="styles/analytics.css">
-        <!-- endbuild -->
+        <link rel="stylesheet" href="styles/analytics.min.css"/>
 
-        <!-- build:css(.tmp) styles/analytics_plugins.css -->
-            <link href="bower_components/nvd3/nv.d3.min.css" rel="stylesheet" type="text/css">
-        <!-- endbuild -->
+        <link rel="stylesheet" href="styles/analytics_plugins.css"/>
 
 
     </head>
@@ -35,16 +29,13 @@
             <p><a class="btn btn-lg btn-success scatter" href="#" onclick="onscatterPlot()">ScatterPlot</a></p>
             <p><a class="btn btn-lg btn-success boxplot" href="#" onclick="onboxPlot()">BoxPlot</a></p>
             <p><a class="btn btn-lg btn-success stacked" href="#" onclick="onstackedPlot()">Stacked Bars</a></p>
-            <p><a class="btn btn-lg btn-success parallel" href="#" onclick="onparallelsPlot()">ParallelCoordinates</a></p>
+            <p><a class="btn btn-lg btn-success parallel" href="#" onclick="onparallelsPlot()">Parallel</a></p>
+            <p><a class="btn btn-lg btn-success parallel" href="#" onclick="onlinePlot()">Line</a></p>
         </div>
 
 
 
-        <!-- build:js scripts/vendor.js -->
-        <!-- bower:js -->
-        <script src="bower_components/jquery/jquery.js"></script>
-        <!-- endbower -->
-        <!-- endbuild -->
+        <script src="scripts/vendor.js"></script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>
@@ -56,9 +47,7 @@
             ga('create','UA-XXXXX-X');ga('send','pageview');
         </script>
 
-        <!-- build:js scripts/main_analytics.js -->
-        <script src="scripts/main.js"></script>
-        <!-- endbuild -->
+        <script src="scripts/main_analytics.js"></script>
 
 
         <script src="bower_components/sass-bootstrap/dist/js/bootstrap.min.js"></script>
@@ -68,11 +57,7 @@
 
         
 
-		<!-- build:js scripts/analytics.min.js -->
-        <script src="scripts/box.js"></script>
-        <script src="scripts/fisheye.js"></script>
-        <script src="scripts/analytics.js"></script>
-        <!-- endbuild -->
+		<script src="scripts/analytics.min.js"></script>
 
 
 </body>
