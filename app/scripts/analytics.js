@@ -86,45 +86,21 @@ var analytics = {
 			return data;
 		}
 
-		/*function convertData(inputData) {
-		   var data = [];
-		   var uniqueArray = [];
-
-			for (i = 0; i < inputData.length; i++) {
-				var array = $.map(inputData[i], function(value, index) {
-				    return [value];
-				});
-				if (uniqueArray.indexOf(array[0]) == -1)
-				{
-					uniqueArray.push(array[0]);
-					data.push({
-						key: array[0],
-						values: []
-					});
-				}
-			}
-			 
-			for (j = 0; j < uniqueArray.length; j++) {
-				for (k = 0; k < inputData.length; k++)
-				{
-					var array = $.map(inputData[k], function(value, index) {
-					    return [value];
-					});
-					if (array[0] == uniqueArray[j])
-					{
-						data[j].values.push({
-						  0: parseFloat(array[1])
-						, 1: parseFloat(array[2])
-						, 2: parseFloat(array[3])
-						});
-					}
-				}	   
-			}
-			return data;
-		}*/
 	},
 
 	boxPlot: function(arg){
+
+		var colors = null;
+		if(arg.colors)
+			colors = arg.colors;
+		else
+			colors = d3.scale.category10();
+
+		keyColor = function(d, i) {
+			var n = d.key.lastIndexOf("_");
+			var key = d.key.substring(0, n);
+			return colors(key);
+		};
 		
 		var el = d3.select(arg.selector);
 		$(arg.selector).empty();
@@ -162,7 +138,8 @@ var analytics = {
 			.attr("height", height + analytics.margin.bottom + analytics.margin.top)
 			.append("g")
 			.attr("transform", "translate(" + ( width/data.length/2 - calc_width/2) + "," + analytics.margin.top + ")")
-			.call(chart);
+			.call(chart)
+			.attr("stroke", keyColor);
 		  
 			  
 
@@ -171,7 +148,7 @@ var analytics = {
 			var data = [];
 			var uniqueArray = [];
 
-			for (i = 0; i < inputData.length; i++) {
+			/*for (i = 0; i < inputData.length; i++) {
 				var array = $.map(inputData[i], function(value, index) {
 				    return [value];
 				});
@@ -179,9 +156,22 @@ var analytics = {
 				{
 					uniqueArray.push(array[0]);
 				}
+			}*/
+			for (i = 0; i < inputData.length; i++) {
+				var array = $.map(inputData[i], function(value, index) {
+				    return [value];
+				});
+				if (uniqueArray.indexOf(array[0]) == -1)
+				{
+					uniqueArray.push(array[0]);
+					data.push({
+						key: array[0],
+						values: []
+					});
+				}
 			}
 			 
-			for (j = 0; j < uniqueArray.length; j++) {
+			/*for (j = 0; j < uniqueArray.length; j++) {
 				for (k = 0; k < inputData.length; k++)
 				{
 					var array = $.map(inputData[k], function(value, index) {
@@ -196,7 +186,43 @@ var analytics = {
 				    if (s > max) max = s;
 				    if (s < min) min = s;
 				}	   
+			}*/
+
+			/*for (j = 0; j < uniqueArray.length; j++) {
+				for (k = 0; k < inputData.length; k++)
+				{
+					var array = $.map(inputData[k], function(value, index) {
+					    return [value];
+					});
+					if (array[0] == uniqueArray[j])
+					{
+						data[j].values.push({
+						  0: new Date(array[1])
+						, 1: parseFloat(array[2])
+						});
+					}
+				}	   
+			}*/
+
+			for (j = 0; j < uniqueArray.length; j++) {
+				for (k = 0; k < inputData.length; k++)
+				{
+					var array = $.map(inputData[k], function(value, index) {
+					    return [value];
+					});
+					if (array[0] != uniqueArray[j]) continue;
+				    var e = j,
+				        s = parseFloat(array[1]),
+				        d = data[e];
+				    if (!d)
+				    	d = data[e] = [s];
+				    else
+				    	data[j].values.push(s);
+				    if (s > max) max = s;
+				    if (s < min) min = s;
+				}	   
 			}
+
 			return data;
 		}
 	},
