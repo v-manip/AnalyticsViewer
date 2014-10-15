@@ -5,12 +5,6 @@ var analytics = {
 	margin : {top: 20, right: 20, bottom: 90, left: 70},
 	
 	scatterPlot: function(arg){
-
-		colors = null;
-		if(arg.colors)
-			colors = arg.colors;
-		else
-			colors = d3.scale.category10();
 	
 		this.data = null;
 		this.headerNames = null;
@@ -19,18 +13,12 @@ var analytics = {
 		sel_x = "";
 		sel_y = "";
 
-		var col_date = [] ; // you can force date type for some data
-		var format_date = "%d/%m/%Y" ; // Cf d3.time.format 
-		// and for automatic detection
+		var col_date = [] ;
+		var format_date = "%d/%m/%Y" ;
 		var exp_date = /^(\d){4}-(\d){2}-(\d){2}/
 		var value;
 
-		//$( window ).resize(resize);
-		//$( window ).on("resize", resize);
-		//$( window ).resize((function (x,y) {return function() {resize(x, y);} })(x,y));
-
-
-		d3.csv("data/data.csv", function(error, data) {
+		d3.csv("data/tmp.csv", function(error, data) {
 
 			// Extract the list of dimensions
 		    // For each dimension, guess if numeric value or not and create vert scales
@@ -51,11 +39,11 @@ var analytics = {
 
   			identifiers = d3.set(data.map(function(d){return d.id;})).values();
 
-  			colors = null;
 			if(arg.colors)
 				colors = arg.colors;
 			else
-				colors = d3.scale.ordinal().domain(identifiers).range(d3.scale.category10());
+				colors = d3.scale.ordinal().domain(identifiers).range(d3.scale.category10().range());
+				
 
   			// Remove id element
   			var index = headerNames.indexOf("id");

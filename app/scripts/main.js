@@ -339,7 +339,7 @@ function onscatterPlot(){
 	var args = {
 		selector: "#canvas",
 		data: plotdata,
-		colors: colors
+		//colors: colors
 	};
 
 	analytics.scatterPlot(args);
