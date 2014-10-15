@@ -1,3 +1,5 @@
+var x,y;
+
 var analytics = {
 
 	margin : {top: 20, right: 20, bottom: 90, left: 70},
@@ -22,6 +24,10 @@ var analytics = {
 		// and for automatic detection
 		var exp_date = /^(\d){4}-(\d){2}-(\d){2}/
 		var value;
+
+		//$( window ).resize(resize);
+		//$( window ).on("resize", resize);
+		//$( window ).resize((function (x,y) {return function() {resize(x, y);} })(x,y));
 
 
 		d3.csv("data/data.csv", function(error, data) {
@@ -124,22 +130,23 @@ var analytics = {
         	});
 
         	var format_x, format_y;
-        	var x, y;
+
+        	var xScale, yScale;
 
        
         	if (col_date.indexOf(sel_x) != -1){
-				x = d3.time.scale().range([0, width]);
+				xScale = d3.time.scale().range([0, width]);
         		format_x = d3.time.format('%x');
         	}else{
-        		x = d3.scale.linear().range([0, width]);
+        		xScale = d3.scale.linear().range([0, width]);
         		format_x = d3.format('s');
         	}
 
         	if (col_date.indexOf(sel_y) != -1){
-        		y = d3.time.scale().range([height, 0]);
+        		yScale = d3.time.scale().range([height, 0]);
         		format_y = d3.time.format('%x');
         	}else{
-        		y = d3.scale.linear().range([height, 0]);
+        		yScale = d3.scale.linear().range([height, 0]);
         		format_y = d3.format('s');
         	}
 
@@ -148,28 +155,28 @@ var analytics = {
 			var color = d3.scale.category10();
 
 			var xAxis = d3.svg.axis()
-			    .scale(x)
+			    .scale(xScale)
 			    .orient("bottom")
 			    .tickFormat(format_x);
 
 			var yAxis = d3.svg.axis()
-			    .scale(y)
+			    .scale(yScale)
 			    .orient("left")
 			    .tickFormat(format_y);
 
       		var svg = d3.select(selector).append("svg")
 			    .attr("width", width)
 			    .attr("height", height)
-			  .append("g")
+			  	.append("g")
 			    .attr("transform", "translate(" + analytics.margin.left + "," + analytics.margin.top + ")");
 
 			d3.max(data, function(d) { return d.y; })
 
-			x.domain(d3.extent(data, function(d) { 
+			xScale.domain(d3.extent(data, function(d) { 
 			 	return d[sel_x];
 			})).nice();
 
-			y.domain(d3.extent(data, function(d) { 
+			yScale.domain(d3.extent(data, function(d) { 
 				return d[sel_y];
 			})).nice();
 
@@ -201,8 +208,8 @@ var analytics = {
 				.enter().append("circle")
 				.attr("class", "dot")
 				.attr("r", 3.5)
-				.attr("cx", function(d) { return x(d[sel_x]); })
-				.attr("cy", function(d) { return y(d[sel_y]); })
+				.attr("cx", function(d) { return xScale(d[sel_x]); })
+				.attr("cy", function(d) { return yScale(d[sel_y]); })
 				.style("fill", function(d) { return colors(d.id); });
 
 			var legend = svg.selectAll(".legend")
@@ -224,9 +231,50 @@ var analytics = {
 				.style("text-anchor", "end")
 				.text(function(d) {return d;});
 
-		}
 
-      	
+			function resize() {
+			    var width = $(selector).width() - analytics.margin.left - analytics.margin.right,
+			 		height = $(selector).height() - analytics.margin.top - analytics.margin.bottom;
+
+			    // Update the range of the scale with new width/height
+			    xScale.range([0, width]);
+			    yScale.range([height, 0]);
+
+			    legend.select("rect")
+					.attr("x", width - 18)
+				
+				legend.select("text")
+					.attr("x", width - 24)
+
+			    // update x axis label position
+			    svg.select('.x.axis')
+			    	.select('.label')
+			    	.attr("x", width);
+
+			    // Update the axis with the new scale
+			    svg.select('.x.axis')
+			      .attr("transform", "translate(0," + height + ")")
+			      .call(xAxis);
+
+
+			    // Update 
+
+			    
+			    svg.select('.y.axis')
+			      .call(yAxis);
+
+			    /* Force D3 to recalculate and update the dots */
+			    svg.selectAll(".dot")
+					.attr("cx", function(d) { return xScale(d[sel_x]); })
+					.attr("cy", function(d) { return yScale(d[sel_y]); });
+			}
+
+			d3.select(window).on('resize', resize); 
+
+			resize();
+
+		}
+     	
 	},
 
 	nv_scatterPlot: function(arg){
