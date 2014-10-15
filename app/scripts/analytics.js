@@ -4,18 +4,12 @@ var analytics = {
 	
 	scatterPlot: function(arg){
 
-		var colors = null;
+		colors = null;
 		if(arg.colors)
 			colors = arg.colors;
 		else
 			colors = d3.scale.category10();
-
-		keyColor = function(d, i) {
-			var n = d.key.lastIndexOf("_");
-			var key = d.key.substring(0, n);
-			return colors(key);
-		};
-		
+	
 		this.data = null;
 		this.headerNames = null;
 		selector = arg.selector;
@@ -23,10 +17,39 @@ var analytics = {
 		sel_x = "";
 		sel_y = "";
 
+		var col_date = [] ; // you can force date type for some data
+		var format_date = "%d/%m/%Y" ; // Cf d3.time.format 
+		// and for automatic detection
+		var exp_date = /^(\d){4}-(\d){2}-(\d){2}/
+		var value;
+
 
 		d3.csv("data/data.csv", function(error, data) {
 
+			// Extract the list of dimensions
+		    // For each dimension, guess if numeric value or not and create vert scales
+		    all_dims = d3.keys(data[0]) ;
+		    // Filter hidden dimensions
+		    dimensions = d3.keys(data[0]).filter(function(key) {
+		    	// Check if column is a date
+		    	if(exp_date.test(data[1][key])){
+		    		data.forEach (function(p) {p[key] = new Date(p[key]);}) ; 
+		    		col_date.push(key);
+		    	// Check if column is a float value
+		    	}else if (value = parseFloat(data[1][key])){
+		    		data.forEach (function(p) {p[key] = parseFloat(p[key]);}) ;
+		    	}
+			});
+
   			headerNames = d3.keys(data[0]);
+
+  			identifiers = d3.set(data.map(function(d){return d.id;})).values();
+
+  			colors = null;
+			if(arg.colors)
+				colors = arg.colors;
+			else
+				colors = d3.scale.ordinal().domain(identifiers).range(d3.scale.category10());
 
   			// Remove id element
   			var index = headerNames.indexOf("id");
@@ -71,6 +94,7 @@ var analytics = {
       			.enter()
         		.append("option")
         		.text(function (d) { 
+        			d3.select(this).attr("selected","selected");
         			return d; 
         	});
 
@@ -94,25 +118,44 @@ var analytics = {
       			.enter()
         		.append("option")
         		.text(function (d) { 
+        			if(sel_y==d)
+        				d3.select(this).attr("selected","selected");
         			return d; 
         	});
 
-						
-			var x = d3.scale.linear()
-			    .range([0, width]);
+        	var format_x, format_y;
+        	var x, y;
 
-			var y = d3.scale.linear()
-			    .range([height, 0]);
+       
+        	if (col_date.indexOf(sel_x) != -1){
+				x = d3.time.scale().range([0, width]);
+        		format_x = d3.time.format('%x');
+        	}else{
+        		x = d3.scale.linear().range([0, width]);
+        		format_x = d3.format('s');
+        	}
 
+        	if (col_date.indexOf(sel_y) != -1){
+        		y = d3.time.scale().range([height, 0]);
+        		format_y = d3.time.format('%x');
+        	}else{
+        		y = d3.scale.linear().range([height, 0]);
+        		format_y = d3.format('s');
+        	}
+
+
+			
 			var color = d3.scale.category10();
 
 			var xAxis = d3.svg.axis()
 			    .scale(x)
-			    .orient("bottom");
+			    .orient("bottom")
+			    .tickFormat(format_x);
 
 			var yAxis = d3.svg.axis()
 			    .scale(y)
-			    .orient("left");
+			    .orient("left")
+			    .tickFormat(format_y);
 
       		var svg = d3.select(selector).append("svg")
 			    .attr("width", width)
@@ -151,7 +194,7 @@ var analytics = {
 				.attr("y", 6)
 				.attr("dy", ".71em")
 				.style("text-anchor", "end")
-				.text(sel_y)
+				.text(sel_y);
 
 			svg.selectAll(".dot")
 				.data(data)
@@ -160,10 +203,10 @@ var analytics = {
 				.attr("r", 3.5)
 				.attr("cx", function(d) { return x(d[sel_x]); })
 				.attr("cy", function(d) { return y(d[sel_y]); })
-				//.style("fill", function(d) { return color(d.species); });
+				.style("fill", function(d) { return colors(d.id); });
 
 			var legend = svg.selectAll(".legend")
-				.data(d3.set(data.map(function(d){return d.id;})).values())
+				.data(identifiers)
 				.enter().append("g")
 				.attr("class", "legend")
 				.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
@@ -172,16 +215,14 @@ var analytics = {
 				.attr("x", width - 18)
 				.attr("width", 18)
 				.attr("height", 18)
-				.style("fill", color);
+				.style("fill", function(d) { return colors(d); });
 
 			legend.append("text")
 				.attr("x", width - 24)
 				.attr("y", 9)
 				.attr("dy", ".35em")
 				.style("text-anchor", "end")
-				.text(function(d) {
-					return d;
-				});
+				.text(function(d) {return d;});
 
 		}
 
