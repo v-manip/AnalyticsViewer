@@ -2,8 +2,193 @@ var analytics = {
 
 	margin : {top: 20, right: 20, bottom: 90, left: 70},
 	
-
 	scatterPlot: function(arg){
+
+		var colors = null;
+		if(arg.colors)
+			colors = arg.colors;
+		else
+			colors = d3.scale.category10();
+
+		keyColor = function(d, i) {
+			var n = d.key.lastIndexOf("_");
+			var key = d.key.substring(0, n);
+			return colors(key);
+		};
+		
+		this.data = null;
+		this.headerNames = null;
+		selector = arg.selector;
+
+		sel_x = "";
+		sel_y = "";
+
+
+		d3.csv("data/data.csv", function(error, data) {
+
+  			headerNames = d3.keys(data[0]);
+
+  			// Remove id element
+  			var index = headerNames.indexOf("id");
+  			if (index > -1) {
+				headerNames.splice(index, 1);
+			}
+
+			sel_x = headerNames[0];
+			sel_y = headerNames[1];
+
+
+        	renderplot(this.selector, data, "Latitude", "Longitude");
+      	});
+
+      	function renderplot(selector, data){
+
+
+      		var width = $(selector).width() - analytics.margin.left - analytics.margin.right,
+				height = $(selector).height() - analytics.margin.top - analytics.margin.bottom;
+
+			var max_x, max_y;
+
+			$(selector).empty()
+
+			var x_select = d3.select(selector)
+      			.insert("div")
+      			.attr("style", "position: absolute; z-index: 100;"+
+      				"right:"+(analytics.margin.right)+
+      				"px; bottom:"+(analytics.margin.bottom + 28)+"px;")
+      			.append("select")
+      			.attr("style", "width: 20px;");
+
+    		x_select
+      			.on("change", function(d) {
+        			sel_x = d3.select(this).property("value");
+        			renderplot(selector, data, sel_x, sel_y);
+      			}
+      		);
+
+      		x_select.selectAll("option")
+      			.data(headerNames)
+      			.enter()
+        		.append("option")
+        		.text(function (d) { 
+        			return d; 
+        	});
+
+        	var y_select = d3.select(selector)
+      			.insert("div")
+      			.attr("style", "position: absolute; z-index: 100;"+
+      				"margin-left:"+(analytics.margin.left)+
+      				"px; margin-top:"+(analytics.margin.top-25)+"px;")
+      			.append("select")
+      			.attr("style", "width: 20px;");
+
+    		y_select
+      			.on("change", function(d) {
+        			sel_y = d3.select(this).property("value");
+        			renderplot(selector, data, sel_x, sel_y);
+      			}
+      		);
+
+      		y_select.selectAll("option")
+      			.data(headerNames)
+      			.enter()
+        		.append("option")
+        		.text(function (d) { 
+        			return d; 
+        	});
+
+						
+			var x = d3.scale.linear()
+			    .range([0, width]);
+
+			var y = d3.scale.linear()
+			    .range([height, 0]);
+
+			var color = d3.scale.category10();
+
+			var xAxis = d3.svg.axis()
+			    .scale(x)
+			    .orient("bottom");
+
+			var yAxis = d3.svg.axis()
+			    .scale(y)
+			    .orient("left");
+
+      		var svg = d3.select(selector).append("svg")
+			    .attr("width", width)
+			    .attr("height", height)
+			  .append("g")
+			    .attr("transform", "translate(" + analytics.margin.left + "," + analytics.margin.top + ")");
+
+			d3.max(data, function(d) { return d.y; })
+
+			x.domain(d3.extent(data, function(d) { 
+			 	return d[sel_x];
+			})).nice();
+
+			y.domain(d3.extent(data, function(d) { 
+				return d[sel_y];
+			})).nice();
+
+
+			svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + height + ")")
+				.call(xAxis)
+				.append("text")
+				.attr("class", "label")
+				.attr("x", width)
+				.attr("y", -6)
+				.style("text-anchor", "end")
+				.text(sel_x);
+
+			svg.append("g")
+				.attr("class", "y axis")
+				.call(yAxis)
+				.append("text")
+				.attr("class", "label")
+				.attr("transform", "rotate(-90)")
+				.attr("y", 6)
+				.attr("dy", ".71em")
+				.style("text-anchor", "end")
+				.text(sel_y)
+
+			svg.selectAll(".dot")
+				.data(data)
+				.enter().append("circle")
+				.attr("class", "dot")
+				.attr("r", 3.5)
+				.attr("cx", function(d) { return x(d[sel_x]); })
+				.attr("cy", function(d) { return y(d[sel_y]); })
+				//.style("fill", function(d) { return color(d.species); });
+
+			var legend = svg.selectAll(".legend")
+				.data(d3.set(data.map(function(d){return d.id;})).values())
+				.enter().append("g")
+				.attr("class", "legend")
+				.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+			legend.append("rect")
+				.attr("x", width - 18)
+				.attr("width", 18)
+				.attr("height", 18)
+				.style("fill", color);
+
+			legend.append("text")
+				.attr("x", width - 24)
+				.attr("y", 9)
+				.attr("dy", ".35em")
+				.style("text-anchor", "end")
+				.text(function(d) {
+					return d;
+				});
+
+		}
+
+      	
+	},
+
+	nv_scatterPlot: function(arg){
 		var colors = null;
 		if(arg.colors)
 			colors = arg.colors;
@@ -247,7 +432,7 @@ var analytics = {
                 //.clipEdge(true);
 
 		chart.xAxis.tickFormat(function(d) { return d3.time.format('%x')(new Date(d)) });
-		chart.yAxis.tickFormat(d3.format());
+		chart.yAxis.tickFormat(d3.format('.02f'));
 		
 		var mine = d3.csv.parse(arg.data);
 		
@@ -346,7 +531,7 @@ var analytics = {
 
 		chart.yAxis     //Chart y-axis settings
 		  .axisLabel('Values')
-		  .tickFormat(d3.format());
+		  .tickFormat(d3.format('.02f'));
 
 		var data = convertData(d3.csv.parse(arg.data));
 
