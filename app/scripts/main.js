@@ -342,7 +342,12 @@ function onscatterPlot(){
 		//colors: colors
 	};
 
-	analytics.scatterPlot(args);
+	var sp = new scatterPlot(args, function(){
+		//sp.absolute("id1","Latitude");
+		sp.colatitude("id1");
+	});
+
+
 }
 
 function onboxPlot(){

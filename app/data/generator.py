@@ -17,7 +17,7 @@ def randomDate(start, end, prop):
     return strTimeProp(start, end, '%Y-%m-%dT%H:%M:%SZ', prop)
 
 product_amount = 5;
-cnt = 40000;
+cnt = 5000;
 
 
 with open('tmp.csv', 'wb') as csvfile:
