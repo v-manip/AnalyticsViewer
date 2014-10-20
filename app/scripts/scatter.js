@@ -11,6 +11,7 @@ function scatterPlot(args, callback) {
 	this.selector = args.selector;
 	this.colors = args.colors;
 	this.col_date = [] ;
+	this.col_vec = [] ;
 	this.sel_x = "";
 	this.sel_y = "";
 	this.identifiers = [];
@@ -21,7 +22,7 @@ function scatterPlot(args, callback) {
 	var value;
 	var self = this;
 
-	d3.csv("data/tmp.csv", function(error, values) {
+	d3.csv("data/swarmdata.csv", function(error, values) {
 
 
 		self.data = values;
@@ -34,6 +35,17 @@ function scatterPlot(args, callback) {
 	    	if(exp_date.test(self.data[1][key])){
 	    		self.data.forEach (function(p) {p[key] = new Date(p[key]);}) ; 
 	    		self.col_date.push(key);
+	    	// Column is vector data
+	    	}else if(self.data[1][key].charAt(0)=="{"){
+	    		self.data.forEach (function(p) {
+	    			var val = p[key].substring(1, p[key].length-1);
+	    			var vector = val.split(";");
+	    			for (var i = vector.length - 1; i >= 0; i--) {
+	    				vector[i] = parseFloat(vector[i]);
+	    			};
+	    			p[key] = vector;
+	    			self.col_vec.push(key);
+	    		}) ;
 	    	// Check if column is a float value
 	    	}else if (value = parseFloat(self.data[1][key])){
 	    		self.data.forEach (function(p) {p[key] = parseFloat(p[key]);}) ;
@@ -41,6 +53,7 @@ function scatterPlot(args, callback) {
 		});
 
 		self.headerNames = d3.keys(self.data[0]);
+		self.headerNames.sort();
 		self.identifiers = d3.set(self.data.map(function(d){return d.id;})).values();
 
 		if(self.colors)
@@ -55,8 +68,12 @@ function scatterPlot(args, callback) {
 			self.headerNames.splice(index, 1);
 		}
 
-		self.sel_x = self.headerNames[0];
-		self.sel_y = self.headerNames[1];
+		// self.sel_x = self.headerNames[0];
+		// self.sel_y = self.headerNames[1];
+
+		self.sel_x = "Latitude";
+		self.sel_y = "F";
+
 
 
     	self.render();
@@ -72,8 +89,6 @@ scatterPlot.prototype.render = function(){
 	var self = this;
 	var width = $(this.selector).width() - analytics.margin.left - analytics.margin.right,
 	height = $(this.selector).height() - analytics.margin.top - analytics.margin.bottom;
-
-	var max_x, max_y;
 
 	$(this.selector).empty()
 
@@ -161,20 +176,53 @@ scatterPlot.prototype.render = function(){
 	    .orient("left")
 	    .tickFormat(format_y);
 
-		var svg = d3.select(this.selector).append("svg")
+	var svg = d3.select(this.selector).append("svg")
 	    .attr("width", width)
 	    .attr("height", height)
 	  	.append("g")
 	    .attr("transform", "translate(" + analytics.margin.left + "," + analytics.margin.top + ")");
 
+	if(this.col_vec.indexOf(this.sel_x) != -1){
+		var length_array = [];
+		this.data.forEach(function(d) {
+			var vec_length = 0;
+			for (var i = d[self.sel_x].length - 1; i >= 0; i--) {
+				vec_length += Math.exp(d[self.sel_x][i]);
+			};
+			vec_length = Math.sqrt(vec_length);
+			length_array.push(vec_length);
+		});
 
-	xScale.domain(d3.extent(this.data, function(d) { 
-	 	return d[self.sel_x];
-	})).nice();
+		xScale.domain(d3.extent(length_array, function(d) { 
+		 	return d;
+		})).nice();
 
-	yScale.domain(d3.extent(this.data, function(d) { 
-		return d[self.sel_y];
-	})).nice();
+	}else{
+		xScale.domain(d3.extent(this.data, function(d) { 
+		 	return d[self.sel_x];
+		})).nice();
+	}
+
+	if(this.col_vec.indexOf(this.sel_y) != -1){
+		var length_array = [];
+		this.data.forEach(function(d) {
+			var vec_length = 0;
+			for (var i = d[self.sel_y].length - 1; i >= 0; i--) {
+				vec_length += Math.exp(d[self.sel_y][i]);
+			};
+			vec_length = Math.sqrt(vec_length);
+			length_array.push(vec_length);
+		});
+
+		yScale.domain(d3.extent(length_array, function(d) { 
+		 	return d;
+		})).nice();
+
+	}else{
+		yScale.domain(d3.extent(this.data, function(d) { 
+			return d[self.sel_y];
+		})).nice();
+	}
 
 
 	svg.append("g")
@@ -206,10 +254,28 @@ scatterPlot.prototype.render = function(){
 		.attr("class", "dot")
 		.attr("r", 3.5)
 		.attr("cx", function(d) { 
-			return xScale(d[self.sel_x]); 
+			if (d[self.sel_x] instanceof Array) {
+				var vec_length = 0;
+				for (var i = d[self.sel_x].length - 1; i >= 0; i--) {
+					vec_length += Math.exp(d[self.sel_x][i]);
+				};
+				vec_length = Math.sqrt(vec_length);
+				return xScale(vec_length);
+			}else{
+				return xScale(d[self.sel_x]); 
+			}
 		})
 		.attr("cy", function(d) { 
-			return yScale(d[self.sel_y]);
+			if (d[self.sel_y] instanceof Array) {
+				var vec_length = 0;
+				for (var i = d[self.sel_y].length - 1; i >= 0; i--) {
+					vec_length += Math.exp(d[self.sel_y][i]);
+				};
+				vec_length = Math.sqrt(vec_length);
+				return yScale(vec_length);
+			}else{
+				return yScale(d[self.sel_y]); 
+			}
 		 })
 		.style("fill", function(d) { return self.colors(d.id); });
 
@@ -296,9 +362,10 @@ scatterPlot.prototype.absolute = function absolute (productid, parameter){
 
 scatterPlot.prototype.colatitude = function colatitude (productid){
 	this.data.forEach (function(p) {
-		if(p["id"] == productid){
-			p["Latitude"] = p["Latitude"] + 90;
-		}
+		//if(p["id"] == productid){
+			if(p["Latitude"]<0)
+				p["Latitude"] = 90 - p["Latitude"];
+		//}
 	}) ;
 	this.render();
 };
