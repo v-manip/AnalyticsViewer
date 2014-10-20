@@ -16,6 +16,9 @@ function scatterPlot(args, callback) {
 	this.sel_y = "";
 	this.identifiers = [];
 
+	this.tooltip = d3.select("body").append("div")   
+        .attr("class", "tooltip")
+		.style("opacity", 0);
 	
 	var format_date = "%d/%m/%Y" ;
 	var exp_date = /^(\d){4}-(\d){2}-(\d){2}/
@@ -277,7 +280,27 @@ scatterPlot.prototype.render = function(){
 				return yScale(d[self.sel_y]); 
 			}
 		 })
-		.style("fill", function(d) { return self.colors(d.id); });
+		.style("fill", function(d) { return self.colors(d.id); })
+		.on("mouseover", function(d) {
+
+			var values = "";
+			for(var propName in d) {
+			    propValue = d[propName]
+			    values = values + propName + ": " + propValue + "<br>";
+			}
+
+            self.tooltip.transition()
+                .duration(100)
+                .style("opacity", .9);
+            self.tooltip.html(values)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+        })           
+        .on("mouseout", function(d){
+            self.tooltip.transition()        
+                .duration(100)      
+                .style("opacity", 0);
+        });
 
 	var legend = svg.selectAll(".legend")
 		.data(this.identifiers)
