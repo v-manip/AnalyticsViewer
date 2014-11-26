@@ -10,10 +10,30 @@ svg {
   user-select: none;
   // Trying to get SVG to act like a greedy block in all browsers
   //display: block;
-  //width:100%;
-  //height:100%;
+  // width: auto !important;
+  // height: auto !important;
 
   }
+
+.scatter{
+  height: 60%;
+  width: 100%;
+}
+
+.parallels{
+  height: 40%;
+  width: 100%;
+}
+
+.point-tooltip {
+  position: absolute;
+  font-size: 12px;
+  color: #FFFFFF;
+  background: #000000;
+  border-radius: 6px;
+  pointer-events:none;
+  padding: 5px;
+}
 
 .foreground path {
   fill: none;
